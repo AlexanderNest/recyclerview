@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
 
     var data = mutableListOf<String>()
     var currentId = 0
+    var poolOfRemoved = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -64,8 +66,15 @@ class MainActivity : AppCompatActivity() {
 
                 Thread(Runnable {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
-                        data.add(index, "$currentId")
-                        currentId++
+                        if (poolOfRemoved.isEmpty()){
+                            data.add(index, "$currentId")
+                            currentId++
+                        }
+                        else{
+                            data.add(index, poolOfRemoved[0])
+                            poolOfRemoved.removeAt(0)
+                        }
+
                         recyclerView.adapter?.notifyDataSetChanged()
                     })
                 }).start()
@@ -85,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         view.startAnimation(anim)
 
         data.remove(id)
+        poolOfRemoved.add(id as String)
         recyclerView.adapter?.notifyDataSetChanged()
 
 
