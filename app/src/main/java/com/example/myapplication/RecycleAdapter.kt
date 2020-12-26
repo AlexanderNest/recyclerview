@@ -18,8 +18,8 @@ class CustomRecyclerAdapter(private val values: List<String>) :
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.largeTextView?.text = values[position]
-        holder.smallTextView?.text = "кот"
     }
+
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var largeTextView: TextView? = null
@@ -27,7 +27,6 @@ class CustomRecyclerAdapter(private val values: List<String>) :
 
         init {
             largeTextView = itemView?.findViewById(R.id.textViewLarge)
-            smallTextView = itemView?.findViewById(R.id.textViewSmall)
         }
     }
 }
