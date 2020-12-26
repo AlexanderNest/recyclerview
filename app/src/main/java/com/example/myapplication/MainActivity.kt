@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
@@ -27,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
             recyclerView.layoutManager = GridLayoutManager(this, 4)
         }
@@ -36,25 +36,35 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = CustomRecyclerAdapter(data)
 
-        autoAdd()
+        var dat = savedInstanceState?.getStringArrayList("data")
+        if (dat != null) {
+            for (i in dat){
+                data.add(i)
+            }
+        }
+        recyclerView.adapter?.notifyDataSetChanged()
 
+        autoAdd()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-
-
+        super.onRestoreInstanceState(savedInstanceState)
+        var id = savedInstanceState.getInt("currentId")
+        currentId = id
+        poolOfRemoved = savedInstanceState.getStringArrayList("removed") as ArrayList<String>
     }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
+        outState.putStringArrayList("data", data)
+        outState.putInt("currentId", currentId)
+        outState.putStringArrayList("removed", poolOfRemoved)
+        cor.cancel()
     }
 
     private fun autoAdd(){
         cor = GlobalScope.launch{
             while (true){
-                val index = data.size//(0..data.size).random()
-                Log.i("currentid", currentId.toString())
+                val index = (0..data.size).random()
 
                 Thread(Runnable {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
@@ -72,9 +82,9 @@ class MainActivity : AppCompatActivity() {
 
                 delay(5000)
             }
-
         }
     }
+
 
     fun onRemoveButtonClicked(view: View){
         var parentlayout = view.parent as LinearLayout
