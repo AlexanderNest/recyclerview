@@ -32,8 +32,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fillList()
-
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
 
@@ -62,10 +60,11 @@ class MainActivity : AppCompatActivity() {
     fun autoAdd(){
         GlobalScope.launch{
             while (true){
+                val index = (0..data.size).random()
+
                 Thread(Runnable {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
-
-                        data.add("$currentId")
+                        data.add(index, "$currentId")
                         currentId++
                         recyclerView.adapter?.notifyDataSetChanged()
                     })
