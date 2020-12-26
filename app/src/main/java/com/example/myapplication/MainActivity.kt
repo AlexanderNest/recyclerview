@@ -1,28 +1,17 @@
 package com.example.myapplication
 
-import android.animation.Animator
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Contacts
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.ViewCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
-import org.w3c.dom.Text
 import kotlinx.coroutines.*
-import java.lang.Thread.sleep
-
-import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,26 +40,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fillList(): List<String> {
-        (0..10).forEach {
-                i -> data.add("$currentId")
+        (0..10).forEach { i -> data.add("$currentId")
                 currentId++
         }
 
         return data
     }
 
-    fun autoAdd(){
+    private fun autoAdd(){
         GlobalScope.launch{
             while (true){
                 val index = (0..data.size).random()
 
                 Thread(Runnable {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
-                        if (poolOfRemoved.isEmpty()){
+                        if (poolOfRemoved.isEmpty()) {
                             data.add(index, "$currentId")
                             currentId++
-                        }
-                        else{
+                        } else {
                             data.add(index, poolOfRemoved[0])
                             poolOfRemoved.removeAt(0)
                         }
@@ -86,16 +73,30 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun onRemoveButtonClicked(view : View){
+    fun onRemoveButtonClicked(view: View){
         var parentlayout = view.parent as LinearLayout
         var id = (parentlayout.getChildAt(0) as TextView).text
 
         val anim = AnimationUtils.loadAnimation(this, R.anim.remove)
+        //view.startAnimation(anim)
+
+        //val anim = AnimationUtils.makeOutAnimation(this, true)
+
+        anim.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+
+            }
+            override fun onAnimationEnd(animation: Animation) {
+                data.remove(id)
+                poolOfRemoved.add(id as String)
+                recyclerView.adapter?.notifyDataSetChanged()
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
         view.startAnimation(anim)
 
-        data.remove(id)
-        poolOfRemoved.add(id as String)
-        recyclerView.adapter?.notifyDataSetChanged()
+
 
 
         /*val animator = ValueAnimator.ofFloat(0f, 100f)
