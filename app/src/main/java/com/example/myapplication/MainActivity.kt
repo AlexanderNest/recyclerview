@@ -17,7 +17,7 @@ import kotlinx.coroutines.*
 class MainActivity : AppCompatActivity() {
 
     var data = arrayListOf<String>()
-    var currentId = 0  //  текущий id для генерации
+    var currentId = 16  //  текущий id для генерации
     var poolOfRemoved = arrayListOf<String>()  // список удаленных id
     lateinit var cor : Job  // корутин для генерации
 
@@ -44,6 +44,10 @@ class MainActivity : AppCompatActivity() {
         }
         recyclerView.adapter?.notifyDataSetChanged()
 
+        val fill = savedInstanceState?.getBoolean("draw")
+        if (fill == null){
+            firstFill()
+        }
         autoAdd()
     }
 
@@ -58,7 +62,15 @@ class MainActivity : AppCompatActivity() {
         outState.putStringArrayList("data", data)  // на экране
         outState.putInt("currentId", currentId)  // текущий id для генерации
         outState.putStringArrayList("removed", poolOfRemoved)  // удаленные с экрана
+        outState.putBoolean("filled", true)
         cor.cancel()
+    }
+
+    fun firstFill(){
+        for (i in 1..15){
+            data.add("$i")
+        }
+        recyclerView.adapter?.notifyDataSetChanged()
     }
 
     private fun autoAdd(){
