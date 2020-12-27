@@ -17,9 +17,9 @@ import kotlinx.coroutines.*
 class MainActivity : AppCompatActivity() {
 
     var data = arrayListOf<String>()
-    var currentId = 0
-    var poolOfRemoved = arrayListOf<String>()
-    lateinit var cor : Job
+    var currentId = 0  //  текущий id для генерации
+    var poolOfRemoved = arrayListOf<String>()  // список удаленных id
+    lateinit var cor : Job  // корутин для генерации
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = CustomRecyclerAdapter(data)
 
-        var dat = savedInstanceState?.getStringArrayList("data")
+        var dat = savedInstanceState?.getStringArrayList("data")  // перенос находящихся элементов при повороте экрана
         if (dat != null) {
             for (i in dat){
                 data.add(i)
@@ -55,16 +55,16 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putStringArrayList("data", data)
-        outState.putInt("currentId", currentId)
-        outState.putStringArrayList("removed", poolOfRemoved)
+        outState.putStringArrayList("data", data)  // на экране
+        outState.putInt("currentId", currentId)  // текущий id для генерации
+        outState.putStringArrayList("removed", poolOfRemoved)  // удаленные с экрана
         cor.cancel()
     }
 
     private fun autoAdd(){
         cor = GlobalScope.launch{
             while (true){
-                val index = (0..data.size).random()
+                val index = (0..data.size).random()  // вствка в случайное место списка
 
                 Thread(Runnable {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
@@ -87,8 +87,8 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onRemoveButtonClicked(view: View){
-        var parentlayout = view.parent as LinearLayout
-        var id = (parentlayout.getChildAt(0) as TextView).text
+        var parentlayout = view.parent as LinearLayout  // родитель удаляемого элемента
+        var id = (parentlayout.getChildAt(0) as TextView).text  // id удаляемого элемента
 
         val anim = AnimationUtils.loadAnimation(this, R.anim.remove)
 
@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity() {
 
             }
             override fun onAnimationEnd(animation: Animation) {
+                // сначала анимация сдвига, потом удаление
                 data.remove(id)
                 poolOfRemoved.add(id as String)
                 recyclerView.adapter?.notifyDataSetChanged()
